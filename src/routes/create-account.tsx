@@ -10,6 +10,7 @@ import {
   Switcher,
   Error,
   Img,
+  Input,
 } from "../components/auth-components";
 
 export default function CreateAccount() {

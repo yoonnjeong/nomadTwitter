@@ -3,6 +3,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -18,6 +19,7 @@ const Form = styled.form`
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  margin-bottom: 10px;
 `;
 const Input = styled.input`
   padding: 10px 20px;
@@ -67,6 +69,7 @@ export default function CreateAccount() {
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setError("");
     e.preventDefault();
     if (isLoading || name === "" || email === "" || password === "") return;
     try {
@@ -86,11 +89,14 @@ export default function CreateAccount() {
       navigate("/");
     } catch (e) {
       //setError
-      setError(e.value);
+      if (e instanceof FirebaseError) {
+        // console.log(e.code, e.message);
+        setError(e.message);
+      }
     } finally {
       setLoading(false);
     }
-    console.log(name, email, password);
+    // console.log(name, email, password);
   };
 
   return (

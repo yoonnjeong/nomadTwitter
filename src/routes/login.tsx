@@ -12,6 +12,7 @@ import {
   Img,
   Input,
 } from "../components/auth-components";
+import GithubButton from "../components/gihub-btn";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -30,7 +31,6 @@ export default function Login() {
     }
   };
 
-  console.log(FirebaseError);
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setError("");
 
@@ -79,6 +79,7 @@ export default function Login() {
       <Switcher>
         Don't have an account?
         <Link to="/create-account">Create one &rarr;</Link>
+        <GithubButton />
       </Switcher>
     </Wrapper>
   );

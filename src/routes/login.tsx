@@ -16,38 +16,65 @@ import GithubButton from "../components/gihub-btn";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [isLoading, setLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  // const [isLoading, setLoading] = useState(false);
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
+  // const [error, setError] = useState("");
+  const [formState, setFormState] = useState({
+    isLoading: false,
+    email: "",
+    password: "",
+    error: "",
+  });
+  const handleInputChange = (key: string, value: boolean | string) => {
+    setFormState({ ...formState, [key]: value });
+  };
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { name, value },
     } = e;
     if (name === "email") {
-      setEmail(value);
+      // setEmail(value);
+      handleInputChange("email", value);
     } else if (name === "password") {
-      setPassword(value);
+      // setPassword(value);
+      handleInputChange("password", value);
     }
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setError("");
+    // setError("");
+    handleInputChange("error", "");
 
     e.preventDefault();
-    if (isLoading || email === "" || password === "") return;
+    // if (isLoading || email === "" || password === "") return;
+    if (
+      formState.isLoading ||
+      formState.email === "" ||
+      formState.password === ""
+    )
+      return;
     try {
-      setLoading(true);
-      await signInWithEmailAndPassword(auth, email, password);
+      // setLoading(true);
+      handleInputChange("isLoading", true);
+      // await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(
+        auth,
+        formState.email,
+        formState.password
+      );
       navigate("/");
     } catch (e) {
       //setError
       if (e instanceof FirebaseError) {
         // console.log(e.code, e.message);
-        setError(e.message);
+        // setError(e.message);
+        handleInputChange("error", e.message);
       }
     } finally {
-      setLoading(false);
+      // setLoading(false);
+      handleInputChange("isLoading", false);
     }
   };
 
@@ -59,7 +86,8 @@ export default function Login() {
       <Form onSubmit={onSubmit}>
         <Input
           name="email"
-          value={email}
+          // value={email}
+          value={formState.email}
           placeholder="Email"
           type="email"
           required
@@ -67,15 +95,21 @@ export default function Login() {
         />
         <Input
           name="password"
-          value={password}
+          // value={password}
+          value={formState.password}
           placeholder="Password"
           type="password"
           required
           onChange={onChange}
         />
-        <Input type="submit" value={isLoading ? "Loading..." : "Log in"} />
+        <Input
+          type="submit"
+          // value={isLoading ? "Loading..." : "Log in"}
+          value={formState.isLoading ? "Loading..." : "Log in"}
+        />
       </Form>
-      {error !== "" ? <Error>{error}</Error> : null}
+      {/* {error !== "" ? <Error>{error}</Error> : null} */}
+      {formState.error !== "" ? <Error>{formState.error}</Error> : null}
       <Switcher>
         Don't have an account?
         <Link to="/create-account">Create one &rarr;</Link>

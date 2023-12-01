@@ -16,51 +16,79 @@ import GithubButton from "../components/gihub-btn";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
-  const [isLoading, setLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  // const [isLoading, setLoading] = useState(false);
+  // const [name, setName] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
+  // const [error, setError] = useState("");
+  const [formState, setFormState] = useState({
+    isLoading: false,
+    name: "",
+    email: "",
+    password: "",
+    error: "",
+  });
+  const handleChange = (key: string, value: boolean | string) => {
+    setFormState({ ...formState, [key]: value });
+  };
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { name, value },
     } = e;
     if (name === "name") {
-      setName(value);
+      // setName(value);
+      handleChange("name", value);
     } else if (name === "email") {
-      setEmail(value);
+      // setEmail(value);
+      handleChange("email", value);
     } else if (name === "password") {
-      setPassword(value);
+      // setPassword(value);
+      handleChange("password", value);
     }
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setError("");
+    // setError("");
+    handleChange("error", "");
     e.preventDefault();
-    if (isLoading || name === "" || email === "" || password === "") return;
+    // if (isLoading || name === "" || email === "" || password === "") return;
+    if (
+      formState.isLoading ||
+      formState.name === "" ||
+      formState.email === "" ||
+      formState.password === ""
+    )
+      return;
     try {
       // create an account
       // set the name of the user.
       // redirect to the home page
-      setLoading(true);
+      // setLoading(true);
+      handleChange("isLoading", true);
       const credentials = await createUserWithEmailAndPassword(
         auth,
-        email,
-        password
+        // email,
+        formState.email,
+        // password
+        formState.password
       );
       console.log(credentials.user);
       await updateProfile(credentials.user, {
-        displayName: name,
+        // displayName: name,
+        displayName: formState.name,
       });
       navigate("/");
     } catch (e) {
       //setError
       if (e instanceof FirebaseError) {
         // console.log(e.code, e.message);
-        setError(e.message);
+        // setError(e.message);
+        handleChange("error", e.message);
       }
     } finally {
-      setLoading(false);
+      // setLoading(false);
+      handleChange("isLoading", false);
     }
     // console.log(name, email, password);
   };
@@ -73,7 +101,7 @@ export default function CreateAccount() {
       <Form onSubmit={onSubmit}>
         <Input
           name="name"
-          value={name}
+          value={formState.name}
           placeholder="Name"
           type="text"
           required
@@ -81,7 +109,7 @@ export default function CreateAccount() {
         />
         <Input
           name="email"
-          value={email}
+          value={formState.email}
           placeholder="Email"
           type="email"
           required
@@ -89,7 +117,7 @@ export default function CreateAccount() {
         />
         <Input
           name="password"
-          value={password}
+          value={formState.password}
           placeholder="Password"
           type="password"
           required
@@ -97,10 +125,11 @@ export default function CreateAccount() {
         />
         <Input
           type="submit"
-          value={isLoading ? "Loading..." : "Create Account"}
+          // value={isLoading ? "Loading..." : "Create Account"}
+          value={formState.isLoading ? "Loading..." : "Create Account"}
         />
       </Form>
-      {error !== "" ? <Error>{error}</Error> : null}
+      {formState.error !== "" ? <Error>{formState.error}</Error> : null}
       <Switcher>
         Already have an account?
         <Link to="/login"> Log in &rarr;</Link>

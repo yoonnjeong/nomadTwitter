@@ -6,7 +6,7 @@ import {
   Wrapper,
   Form,
 } from "../components/auth-components";
-import { getAuth, fetchSignInMethodsForEmail } from "firebase/auth";
+import { auth } from "../firebase";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
@@ -37,16 +37,7 @@ export default function ResetPassword() {
     try {
       setLoading(true);
 
-      // 이메일이 등록되어 있는지 확인
-      const authPass = getAuth();
-      const signInMethods = await fetchSignInMethodsForEmail(authPass, email);
-
-      // 등록되어 있지 않다면 에러 처리
-      if (signInMethods.length === 0) {
-        setError("이메일이 등록되어 있지 않습니다.");
-        return;
-      }
-      await sendPasswordResetEmail(authPass, email);
+      await sendPasswordResetEmail(auth, email);
       navigate("/login");
     } catch (e) {
       if (e instanceof FirebaseError) {

@@ -13,6 +13,7 @@ import {
   Input,
 } from "../components/auth-components";
 import GithubButton from "../components/gihub-btn";
+import PasswordButton from "../components/password-btn";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -114,6 +115,7 @@ export default function Login() {
         Don't have an account?
         <Link to="/create-account">Create one &rarr;</Link>
         <GithubButton />
+        <PasswordButton />
       </Switcher>
     </Wrapper>
   );

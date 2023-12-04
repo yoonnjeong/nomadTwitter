@@ -4,7 +4,7 @@ import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
 const Button = styled.span`
-  margin-top: 50px;
+  margin-top: 30px;
   background-color: #fff;
   font-weight: 600;
   border-radius: 50px;

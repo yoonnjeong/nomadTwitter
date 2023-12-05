@@ -75,6 +75,7 @@ export default function PostTweetForm() {
     try {
       setLoading(true);
       await addDoc(collection(db, "tweets"), {
+        //addDoc는 firebase함수, 새로운 문서 생성
         tweet,
         createdAt: Date.now(),
         username: user.displayName || "Anonymous",

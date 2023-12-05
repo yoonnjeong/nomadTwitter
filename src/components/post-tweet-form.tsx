@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import React, { useState } from "react";
-import { addDoc, collection } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
+import { auth, db, storage } from "../firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const Form = styled.form`
   display: flex;
@@ -74,13 +75,25 @@ export default function PostTweetForm() {
 
     try {
       setLoading(true);
-      await addDoc(collection(db, "tweets"), {
+      const doc = await addDoc(collection(db, "tweets"), {
         //addDoc는 firebase함수, 새로운 문서 생성
         tweet,
         createdAt: Date.now(),
         username: user.displayName || "Anonymous",
         userId: user.uid,
       });
+      console.log(doc);
+      if (file) {
+        const locationRef = ref(
+          storage,
+          `tweets/${user.uid}-${user.displayName}/${doc.id}`
+        );
+        const result = await uploadBytes(locationRef, file); //promise 반환
+        const url = await getDownloadURL(result.ref); //promise 반환
+        await updateDoc(doc, { photo: url });
+      }
+      setTweet("");
+      setFile(null);
     } catch (error) {
       console.log(error);
     } finally {
@@ -91,6 +104,7 @@ export default function PostTweetForm() {
   return (
     <Form onSubmit={onSubmit}>
       <TextArea
+        required
         rows={5}
         maxLength={180}
         onChange={onChange}

@@ -27,6 +27,7 @@ export default function Timeline() {
     );
     // 문서 가져오기, getDocs의 결과는 쿼리의 snapshot을 받게 된다
     const snapshot = await getDocs(tweetsQuery);
+    //각 문서에 접근해서 문서 데이터 출력
     snapshot.docs.forEach((doc) => console.log(doc.data()));
   };
   useEffect(() => {

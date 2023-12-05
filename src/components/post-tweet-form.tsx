@@ -65,11 +65,17 @@ export default function PostTweetForm() {
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (files && files.length === 1) {
+      // 파일 changeEvent,
+      if (files[0].size > 1024 * 1024) {
+        alert("1MB 이하의 사진만 업로드 가능합니다");
+        return;
+      }
       setFile(files[0]);
     }
   };
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // 현재 로그인된 유저의 정보
     const user = auth.currentUser;
     if (!user || isLoading || tweet === "" || tweet.length > 180) return;
 
@@ -82,15 +88,16 @@ export default function PostTweetForm() {
         username: user.displayName || "Anonymous",
         userId: user.uid,
       });
-      console.log(doc);
+      //업로드된 파일이 있으면
       if (file) {
+        //파일 저정 경로, ref(storage, url)
         const locationRef = ref(
           storage,
           `tweets/${user.uid}-${user.displayName}/${doc.id}`
         );
-        const result = await uploadBytes(locationRef, file); //promise 반환
-        const url = await getDownloadURL(result.ref); //promise 반환
-        await updateDoc(doc, { photo: url });
+        const result = await uploadBytes(locationRef, file); // uploadBytes(storageRef, file), 실행 후 결과에 대한 Promise 를 반환.
+        const url = await getDownloadURL(result.ref); // getDownloadURL(ref), 반환된 결과에서 참조값을 받아 이미지 URL를 불러옴.
+        await updateDoc(doc, { photo: url }); // updateDoc(docRef, data), 작성한 트윗에 이미지 URL 을 추가함.
       }
       setTweet("");
       setFile(null);

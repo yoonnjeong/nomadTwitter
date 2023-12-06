@@ -16,6 +16,7 @@ const Photo = styled.img`
   width: 100px;
   height: 100px;
   border-radius: 15px;
+  object-fit: cover;
 `;
 const Username = styled.span`
   font-weight: 600;
@@ -33,11 +34,7 @@ export default function Tweets({ username, photo, tweet }: ITweet) {
         <Username>{username}</Username>
         <Payload>{tweet}</Payload>
       </Column>
-      {photo ? (
-        <Column>
-          <Photo src={photo} />
-        </Column>
-      ) : null}
+      <Column>{photo ? <Photo src={photo} /> : null}</Column>
     </Wrapper>
   );
 }

@@ -41,7 +41,7 @@ const MenuItem = styled.div`
 export default function Layout() {
   const navigate = useNavigate();
   const onLogOut = async () => {
-    const ok = confirm("Are you sure you want log out");
+    const ok = confirm("Are you sure you want log out?");
     if (ok) {
       await auth.signOut();
       navigate("/login");

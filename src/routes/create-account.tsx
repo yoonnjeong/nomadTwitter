@@ -83,7 +83,7 @@ export default function CreateAccount() {
         // displayName: name,
         displayName: formState.name,
       });
-      await sendEmailVerification(credentials.user);
+      await sendEmailVerification(credentials.user); // 사용자만 지정해주면 사용자를 찾아서 이메일을 보내준다
       navigate("/");
     } catch (e) {
       //setError

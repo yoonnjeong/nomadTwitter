@@ -3,6 +3,8 @@ import { ITweet } from "./timline";
 import { auth, db, storage } from "../firebase";
 import { deleteDoc, doc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
+import { useState } from "react";
+import EditTweetForm from "./edit-tweet-form";
 
 const Wrapper = styled.div`
   display: grid;
@@ -29,9 +31,36 @@ const Payload = styled.p`
   margin: 10px 0;
   font-size: 18px;
 `;
+const Row = styled.div`
+  display: flex;
+  margin-top: 20px;
+`;
 
-const DeleteButton = styled.button`
-  background-color: tomato;
+// const DeleteButton = styled.button`
+//   background-color: tomato;
+//   color: #fff;
+//   border: 0;
+//   font-weight: 600;
+//   font-size: 12px;
+//   padding: 5px 10px;
+//   text-transform: uppercase;
+//   border-radius: 5px;
+//   cursor: pointer;
+// `;
+// const EditButton = styled.button`
+//   background-color: #999;
+//   color: #fff;
+//   border: 0;
+//   font-weight: 600;
+//   font-size: 12px;
+//   padding: 5px 10px;
+//   text-transform: uppercase;
+//   border-radius: 5px;
+//   cursor: pointer;
+//   margin-right: 6px;
+// `;
+const TweetButton = styled.button<{ color?: string }>`
+  background-color: ${(props) => props.color || "tomato"};
   color: #fff;
   border: 0;
   font-weight: 600;
@@ -40,9 +69,20 @@ const DeleteButton = styled.button`
   text-transform: uppercase;
   border-radius: 5px;
   cursor: pointer;
+  margin-right: 6px;
 `;
 
-export default function Tweets({ username, photo, tweet, userId, id }: ITweet) {
+// 지정한 값만 넘어오도록 하게 하기
+export default function Tweets({
+  username,
+  photo,
+  tweet,
+  userId,
+  id,
+  updateAt,
+  createdAt,
+}: ITweet) {
+  const [editToggle, setEditToggle] = useState(false);
   const user = auth.currentUser;
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this tweet?");
@@ -64,14 +104,45 @@ export default function Tweets({ username, photo, tweet, userId, id }: ITweet) {
       //
     }
   };
+  const onEditClicked = () => {
+    setEditToggle(!editToggle);
+  };
+  const updateAtDate = new Date(updateAt as number);
+  const createdAtDate = new Date(createdAt as number);
+
+  const updateAtString = updateAtDate.toLocaleString(); // 수정된 날짜와 시간을 읽기 쉬운 형태로 변환
+  const createdAtString = createdAtDate.toLocaleString(); // 생성된 날짜와 시간을 읽기 쉬운 형태로 변환
 
   return (
     <Wrapper>
       <Column>
-        <Username>{username}</Username>
-        <Payload>{tweet}</Payload>
+        <Username>
+          {username}{" "}
+          {updateAt ? ` | (수정된 트윗) ${updateAtString}` : createdAtString}
+        </Username>
+        {editToggle ? (
+          <EditTweetForm
+            tweet={tweet}
+            userId={userId}
+            id={id}
+            photo={photo}
+            setEditToggle={setEditToggle}
+          />
+        ) : (
+          <Payload>{tweet}</Payload>
+        )}
+        {/* 삭제는 현재 로그인된 유저와 트윗의 userId 가 같을 때만 가능 */}
         {user?.uid === userId ? (
-          <DeleteButton onClick={onDelete}>Delete</DeleteButton>
+          <Row>
+            {user?.uid === userId ? (
+              <TweetButton onClick={onDelete}>Delete</TweetButton>
+            ) : null}
+            {user?.uid === userId ? (
+              <TweetButton color="gray" onClick={onEditClicked}>
+                {editToggle ? "Cancel" : "Edit"}
+              </TweetButton>
+            ) : null}
+          </Row>
         ) : null}
       </Column>
       <Column>{photo ? <Photo src={photo} /> : null}</Column>

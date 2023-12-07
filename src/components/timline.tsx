@@ -27,6 +27,7 @@ export interface ITweet {
   userId: string;
   username: string;
   createdAt: number;
+  updateAt?: number;
 }
 
 export default function Timeline() {
@@ -34,13 +35,15 @@ export default function Timeline() {
   const [tweets, setTweet] = useState<ITweet[]>([]);
 
   useEffect(() => {
+    //  unsubscribe 는 추후 사용자가 Timeline 컴포넌트를 보고있지 않을 때, 서버에서 변경점이 있을경우 계속 값을 요청하지 않기 위해 쓸것임. (최적화, 비용 절감)
     let unsubscribe: Unsubscribe | null = null;
-    // fetchTweets 바동기 함수 호출
+
+    // 실제 서버에서 데이터를 요청하는 함수
     const fetchTweets = async () => {
       const tweetsQuery = query(
         // 쿼리 생성
         collection(db, "tweets"), // 어떤 컬렉션을 쿼리로 지정하고 싶은지 지정
-        orderBy("createdAt", "desc"), // 최신 순으로 정렬
+        orderBy("createdAt", "desc"), // 최신 순으로 내림차순 정렬
         limit(25) // 구독료를 절약하기 위해 페이지네이션을 만든다
       );
       // 문서 가져오기, getDocs의 결과는 쿼리의 snapshot을 받게 된다
@@ -57,12 +60,14 @@ export default function Timeline() {
       //     photo,
       //     id: doc.id,
       //   };
-      // });
+      // }); // getDocs로도 사용 가능하나 실시간 반응을 안함
+
       unsubscribe = await onSnapshot(tweetsQuery, (snapshot) => {
         //문서를 한 번만 가져오는 대신 퀴리에 리스너를 추가해서 문서의 변화가 생기면
         // snapshot 문서를 배열로 반환한다 (snapshot.docs)
         const tweets = snapshot.docs.map((doc) => {
-          const { tweet, createdAt, userId, username, photo } = doc.data();
+          const { tweet, createdAt, userId, username, photo, updateAt } =
+            doc.data();
           return {
             tweet,
             createdAt,
@@ -70,6 +75,8 @@ export default function Timeline() {
             username,
             photo,
             id: doc.id,
+            updateAt: updateAt || null,
+            // doc.id 는 문서의 고유 id, userId 와는 다름.
           };
         });
         setTweet(tweets); //추출한 데이터를 받아서 화면에 출력

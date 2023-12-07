@@ -1,4 +1,8 @@
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 import { useState } from "react";
 import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
@@ -79,6 +83,7 @@ export default function CreateAccount() {
         // displayName: name,
         displayName: formState.name,
       });
+      await sendEmailVerification(credentials.user);
       navigate("/");
     } catch (e) {
       //setError

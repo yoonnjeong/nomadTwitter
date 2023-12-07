@@ -10,6 +10,8 @@ export default function ProtectedRoute({
   console.log(user);
   if (user === null) {
     return <Navigate to="/login" />;
+  } else if (user.emailVerified === false) {
+    return <Navigate to="/vertification" />;
   }
   return children;
 }

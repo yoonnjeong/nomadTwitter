@@ -82,7 +82,7 @@ export default function Login() {
   return (
     <Wrapper>
       <Title>
-        Login into <Img src="./public/twitter.svg" />
+        Login into <Img src="./twitter.svg" />
       </Title>
       <Form onSubmit={onSubmit}>
         <Input

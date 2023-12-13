@@ -102,7 +102,7 @@ export default function CreateAccount() {
   return (
     <Wrapper>
       <Title>
-        Join to <Img src="./public/twitter.svg" />
+        Join to <Img src="./twitter.svg" />
       </Title>
       <Form onSubmit={onSubmit}>
         <Input

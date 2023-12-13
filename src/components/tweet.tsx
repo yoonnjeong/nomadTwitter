@@ -94,7 +94,7 @@ export default function Tweets({
         const photoRef = ref(
           // 사진 경로 받아오기
           storage,
-          `tweets/${user.uid}-${user.displayName}/${id}`
+          `tweets/${user.uid}/${id}`
         );
         await deleteObject(photoRef); // 사진 삭제
       }

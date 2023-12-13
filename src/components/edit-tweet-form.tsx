@@ -119,17 +119,11 @@ export default function EditTweetForm({
       if (editPhoto) {
         // 기존 사진이 있을경우 기존 사진을 스토리지에서 삭제함.
         if (photo) {
-          const originRef = ref(
-            storage,
-            `tweets/${userId}-${user.displayName}/${id}`
-          );
+          const originRef = ref(storage, `tweets/${userId}/${id}`);
           await deleteObject(originRef);
         }
         // 새로운 사진을 기존의 경로에 그대로 업로드한 뒤, 수정할 트윗에 이미지 url 추가. (사진이 없었다면 사진을 추가하는게 됨.)
-        const newRef = ref(
-          storage,
-          `tweets/${userId}-${user.displayName}/${id}`
-        );
+        const newRef = ref(storage, `tweets/${userId}/${id}`);
         const uploadRes = await uploadBytes(newRef, editPhoto);
         const url = await getDownloadURL(uploadRes.ref);
         await updateDoc(docRef, {

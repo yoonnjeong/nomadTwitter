@@ -91,10 +91,7 @@ export default function PostTweetForm() {
       //업로드된 파일이 있으면
       if (file) {
         //파일 저정 경로, ref(storage, url)
-        const locationRef = ref(
-          storage,
-          `tweets/${user.uid}-${user.displayName}/${doc.id}`
-        );
+        const locationRef = ref(storage, `tweets/${user.uid}/${doc.id}`);
         const result = await uploadBytes(locationRef, file); // uploadBytes(storageRef, file), 실행 후 결과에 대한 Promise 를 반환.
         const url = await getDownloadURL(result.ref); // getDownloadURL(ref), 반환된 결과에서 참조값을 받아 이미지 URL를 불러옴.
         await updateDoc(doc, { photo: url }); // updateDoc(docRef, data), 작성한 트윗에 이미지 URL 을 추가함.

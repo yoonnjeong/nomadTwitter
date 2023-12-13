@@ -1,8 +1,17 @@
 import styled from "styled-components";
-import { auth, storage } from "../firebase";
-import { useState } from "react";
+import { auth, db, storage } from "../firebase";
+import { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import Tweet from "../components/tweet";
 
 const Wrapper = styled.div`
   display: flex;
@@ -33,10 +42,18 @@ const AvatarInput = styled.input`
 const Name = styled.span`
   font-size: 22px;
 `;
+const Tweets = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 100px;
+`;
 
 export default function Profile() {
   const user = auth.currentUser;
   const [avartar, setAvatar] = useState(user?.photoURL);
+  const [tweets, setTweets] = useState<ITweet[]>([]);
 
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -54,6 +71,33 @@ export default function Profile() {
       await updateProfile(user, { photoURL: avatarUrl });
     }
   };
+
+  const fetchTweets = async () => {
+    const tweetsQuery = query(
+      collection(db, "tweets"),
+      where("userId", "==", user?.uid), // tweets들의 구조를 참조 할수 있다, userId가 현재 로그인한 user의 uid와 같다면
+      orderBy("createdAt", "desc"),
+      limit(25)
+    );
+    const snapshot = await getDocs(tweetsQuery);
+    const tweets = snapshot.docs.map((doc) => {
+      const { tweet, createdAt, userId, username, photo, updateAt } =
+        doc.data();
+      return {
+        tweet,
+        createdAt,
+        userId,
+        username,
+        photo,
+        id: doc.id,
+        updateAt: updateAt || null,
+      };
+    });
+    setTweets(tweets);
+  };
+  useEffect(() => {
+    fetchTweets();
+  }, []);
 
   return (
     <Wrapper>
@@ -83,6 +127,11 @@ export default function Profile() {
       />
       {/* <Name>{user?.displayName ? user.displayName : "Anonymous"}</Name> */}
       <Name>{user?.displayName ?? "Anonymous"}</Name>
+      <Tweets>
+        {tweets.map((tweet) => (
+          <Tweet key={tweet.id} {...tweet} />
+        ))}
+      </Tweets>
     </Wrapper>
   );
 }
